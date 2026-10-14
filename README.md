@@ -104,6 +104,43 @@ ERROR_NOTIFIER_DISCORD_WEBHOOK=https://discord.com/api/webhooks/YOUR/DISCORD/WEB
 
 ---
 
+## 🔑 Webhook URL の取得方法
+
+### Slack の場合
+1. [Slack API: Your Apps](https://api.slack.com/apps) にアクセスし、**「Create New App」** → **「From scratch」** を選択。
+2. アプリ名（例: `Error Notifier`）とワークスペースを入力して作成。
+3. 左側メニューの **「Incoming Webhooks」** をクリックし、機能を **「Activate Incoming Webhooks」を ON** にします。
+4. ページ最下部の **「Add New Webhook to Workspace」** をクリックし、通知先チャンネルを選択して許可します。
+5. 生成された **Webhook URL**（`https://hooks.slack.com/services/...`）をコピーして `.env` に設定します。
+
+### Discord の場合
+1. 通知を受信したいチャンネルの横にある **歯車アイコン（チャンネルの編集）** をクリックします。
+2. 左メニューの **「連携」**（Integrations）→ **「ウェブフック」** を選択します。
+3. **「新しいウェブフック」** をクリックし、任意の名前（例: `Error Notifier`）を設定します。
+4. **「ウェブフック URL をコピー」** ボタンをクリックし、コピーした URL を `.env` に設定します。
+
+---
+
+## 🧪 通知テストの実行方法（導入確認）
+
+設定が完了したら、`artisan tinker` を使ってコマンドラインから 1行でテスト例外を発行し、通知が届くか確認できます：
+
+```bash
+php artisan tinker --execute="report(new \RuntimeException('B-Beacon Error Notifier のテスト例外です！'));"
+```
+
+ブラウザ経由で確認したい場合は、`routes/web.php` に一時的なテストルートを追加してアクセスしてください：
+
+```php
+Route::get('/test-error', function () {
+    throw new \RuntimeException('Webリクエスト経由のエラー通知テストです！');
+});
+```
+
+実行後、Slack または Discord にリッチカード通知が即座に届けば導入成功です！🎉
+
+---
+
 ## 🖥️ リアルタイム設定ジェネレーター (GUI)
 
 本パッケージには、ブラウザで開くだけですぐに使える **GUI 設定ジェネレーター（`generator.html`）** が同梱されています。
