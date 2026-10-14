@@ -123,8 +123,7 @@ class DiscordEmbedFormatter
             'fields' => $fields,
             'timestamp' => date('c'),
             'footer' => [
-                'text' => 'Powered by B-Beacon & brainy/laravel-error-notifier',
-                'icon_url' => 'https://b-beacon.biz/favicon.ico',
+                'text' => 'Powered by brainy/laravel-error-notifier',
             ],
         ];
 

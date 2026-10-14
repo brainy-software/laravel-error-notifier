@@ -126,7 +126,7 @@ ERROR_NOTIFIER_DISCORD_WEBHOOK=https://discord.com/api/webhooks/YOUR/DISCORD/WEB
 設定が完了したら、`artisan tinker` を使ってコマンドラインから 1行でテスト例外を発行し、通知が届くか確認できます：
 
 ```bash
-php artisan tinker --execute="report(new \RuntimeException('B-Beacon Error Notifier のテスト例外です！'));"
+php artisan tinker --execute="report(new \RuntimeException('Laravel Error Notifier のテスト例外です！'));"
 ```
 
 ブラウザ経由で確認したい場合は、`routes/web.php` に一時的なテストルートを追加してアクセスしてください：
@@ -322,15 +322,7 @@ composer test
 
 ---
 
-## 🔗 関連プロジェクト
-
-本パッケージは、Web サービスの死活監視・障害検知サービス **[B-Beacon (ビービーコン)](https://b-beacon.biz)** のエラー監視基盤からスピンオフして開発されたオープンソースです。
-
-もし「エラー通知だけでなく、Web サイトや API の外形監視・パフォーマンス計測、チームでの障害管理も一括で行いたい」という場合は、ぜひ [B-Beacon](https://b-beacon.biz) もご覧ください。
-
----
-
 ## 📄 ライセンス
 
 本ソフトウェアは [MIT License](LICENSE) の下で公開されています。  
-Copyright (c) 2026 [合同会社ブレイニーソフトウェア (Brainy Software LLC)](https://brainy-software.co.jp)
+Copyright (c) 2026 [合同会社ブレイニーソフトウェア (Brainy Software LLC)](https://brainy.co.jp)

@@ -161,7 +161,7 @@ class SlackBlockKitFormatter
             'elements' => [
                 [
                     'type' => 'mrkdwn',
-                    'text' => "🕒 {$timestamp} | Powered by <https://b-beacon.biz|*B-Beacon*> & *brainy/laravel-error-notifier*",
+                    'text' => "🕒 {$timestamp} | Powered by *brainy/laravel-error-notifier*",
                 ],
             ],
         ];
