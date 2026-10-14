@@ -1,41 +1,43 @@
-# Laravel Error Notifier (Slack & Discord)
+# Laravel Error Notifier (Slack & Discord 対応)
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/brainy/laravel-error-notifier.svg?style=flat-square)](https://packagist.org/packages/brainy/laravel-error-notifier)
 [![Total Downloads](https://img.shields.io/packagist/dt/brainy/laravel-error-notifier.svg?style=flat-square)](https://packagist.org/packages/brainy/laravel-error-notifier)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE)
 
-A lightweight, zero-configuration real-time error notifier for Laravel applications.  
-Deliver rich, actionable alerts directly to **Slack** (via Block Kit) and **Discord** (via Embeds) without setting up or paying for heavy SaaS platforms (e.g. Sentry, Datadog).
+サーバー構築や外部 SaaS（Sentry や Datadog など）の契約が一切不要な、Laravel 専用の軽量リアルタイムエラー通知パッケージです。  
+未処理の例外や 500 系エラーを、見やすい **Slack**（Block Kit 形式）や **Discord**（Embed 形式）へ即座にリッチ通知します。
 
 ---
 
 > ### 🚀 Powered by [B-Beacon](https://b-beacon.biz)
 > **[B-Beacon](https://b-beacon.biz)** は、開発チームの生産性とシステムの信頼性を最大化する次世代のクラウド監視・開発者支援プラットフォームです。  
-> 本パッケージは、B-Beacon のエラー監視基盤のエッセンスを抽出し、誰でも 3 分で Laravel に導入できるスタンドアローン OSS として一般公開されています。
+> 本パッケージは、B-Beacon のエラー監視基盤のエッセンスを抽出し、誰でも 3 分で Laravel アプリに導入できる OSS として一般公開されています。
 >
 > 👉 [B-Beacon の詳細と無料トライアルはこちら](https://b-beacon.biz)
 
 ---
 
-## ✨ Features
+## ✨ 主な特徴
 
-- **⚡ Zero-Config Instant Setup**: `composer require` and set your webhook URL in `.env`. Works out of the box with Laravel Package Discovery.
-- **🎨 Rich Alert Layouts**:
-  - **Slack Block Kit**: Clean cards with exception class, message, request method/URL, client IP, auth user, and stack trace.
-  - **Discord Embeds**: Beautifully formatted, colored embed cards with field grids.
-- **🛡️ Built-in Rate Limiting / Throttling**:
-  - Automatically suppresses identical duplicate errors for a configurable window (default: 10 minutes) using Laravel's Cache, preventing Slack channel flooding during traffic spikes.
-- **🔒 Sensitive Data Masking**:
-  - Automatically masks passwords, tokens, API keys, and credit card numbers from request inputs.
-- **🎯 Smart Exception Filtering**:
-  - Common non-critical exceptions (404 Not Found, 422 Validation Error, 403 Forbidden, 419 Token Mismatch) are excluded by default.
-- **🧩 Laravel 11 & 12 Ready**: Fully compatible with the modern Laravel exception architecture.
+- **⚡ ゼロコンフィグ即時導入**:
+  - `composer require` して `.env` に Webhook URL を設定するだけ。Laravel Package Discovery により追加コード不要ですぐに動きます。
+- **🎨 リッチで見やすい通知デザイン**:
+  - **Slack (Block Kit)**: 例外クラス名、エラーメッセージ、発生URL/HTTPメソッド、クライアントIP、ログインユーザー、アプリコードに絞ったスタックトレースを綺麗にカード表示。
+  - **Discord (Embeds)**: カラーリングされた見やすいフィールド構成で通知。
+- **🛡️ 通知の連打防止（スロットリング機能）**:
+  - Laravel のキャッシュ機能（Cache）を活用し、同じエラーが短時間に大量発生しても通知がパンクしない仕組み（デフォルト: 同一エラーは10分間に1回のみ通知）。
+- **🔒 機密データの自動マスキング**:
+  - リクエストパラメータ内のパスワード、APIトークン、シークレット鍵、クレジットカード番号などを自動的に `********` に置換して送信。
+- **🎯 不要な例外の除外フィルター**:
+  - 404（NotFound）、422（バリデーションエラー）、403（アクセス拒否）、419（CSRFトークン不一致）など、対応不要なクライアント起因のエラーはデフォルトで自動除外。
+- **🧩 Laravel 11 & 12 完全対応**:
+  - 最新の Laravel 例外ハンドリング機構（`bootstrap/app.php`）に自動適応。
 
 ---
 
-## 📦 Installation
+## 📦 インストール方法
 
-Install via Composer:
+Composer 経由でパッケージをインストールします：
 
 ```bash
 composer require brainy/laravel-error-notifier
@@ -43,42 +45,44 @@ composer require brainy/laravel-error-notifier
 
 ---
 
-## ⚙️ Quick Start (Zero Config)
+## ⚙️ クイックスタート（3分で完了）
 
-Add your Webhook URL to your `.env` file:
+`.env` ファイルに通知先の Webhook URL を設定するだけで完了です：
 
 ```env
-# Slack Incoming Webhook
+# Slack Incoming Webhook URL
 ERROR_NOTIFIER_SLACK_WEBHOOK=https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK
 
-# (Optional) Discord Webhook
+# (オプション) Discord Webhook URL
 ERROR_NOTIFIER_DISCORD_WEBHOOK=https://discord.com/api/webhooks/YOUR/DISCORD/WEBHOOK
 ```
 
-That's it! Any unhandled 500 error or fatal exception in `production` or `staging` will now trigger instant alerts to your configured channel.
+これだけで、本番環境（`production`）およびステージング環境（`staging`）で未処理の例外が発生した際、自動的に Slack / Discord へ通知が届きます。
 
 ---
 
-## 🛠️ Advanced Configuration
+## 🛠️ 高度なカスタマイズ
 
-To customize channels, throttling, ignored exceptions, or sensitive keys, publish the configuration file:
+通知対象の環境、スロットリング期間、除外する例外クラス、マスキングキーなどを変更したい場合は、設定ファイルを公開（パブリッシュ）してください：
 
 ```bash
 php artisan vendor:publish --tag="error-notifier-config"
 ```
 
-This generates `config/error-notifier.php`:
+実行すると `config/error-notifier.php` が生成されます：
 
 ```php
 return [
-    // Master switch (null = auto-activate if webhook is present in production/staging)
+    // マスター有効フラグ (null の場合、本番・ステージング環境かつ Webhook 設定があれば自動有効化)
     'enabled' => env('ERROR_NOTIFIER_ENABLED', null),
 
+    // 通知を有効にする環境一覧
     'environments' => [
         'production',
         'staging',
     ],
 
+    // 通知チャネル設定
     'channels' => [
         'slack' => [
             'enabled' => env('ERROR_NOTIFIER_SLACK_ENABLED', true),
@@ -94,14 +98,14 @@ return [
         ],
     ],
 
-    // Throttling configuration
+    // 通知の連打防止（スロットリング）設定
     'throttle' => [
         'enabled' => env('ERROR_NOTIFIER_THROTTLE_ENABLED', true),
-        'period' => (int) env('ERROR_NOTIFIER_THROTTLE_PERIOD', 600), // seconds
-        'cache_store' => env('ERROR_NOTIFIER_CACHE_STORE', null),
+        'period' => (int) env('ERROR_NOTIFIER_THROTTLE_PERIOD', 600), // 秒単位 (600秒 = 10分)
+        'cache_store' => env('ERROR_NOTIFIER_CACHE_STORE', null), // null の場合はデフォルトのキャッシュドライバを使用
     ],
 
-    // Exceptions that will never trigger notifications
+    // 通知を除外する例外クラス一覧
     'ignored_exceptions' => [
         \Symfony\Component\HttpKernel\Exception\NotFoundHttpException::class,
         \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException::class,
@@ -112,7 +116,7 @@ return [
         \Illuminate\Routing\Exceptions\InvalidSignatureException::class,
     ],
 
-    // Sensitive keys to automatically mask
+    // 自動マスキングするリクエストパラメータのキー名
     'mask_keys' => [
         'password',
         'password_confirmation',
@@ -123,22 +127,22 @@ return [
         'credit_card',
     ],
 
-    // Application stack trace line limit
+    // 通知内に表示するスタックトレースの最大行数
     'max_trace_lines' => 12,
 ];
 ```
 
 ---
 
-## 🧪 Testing
+## 🧪 テストの実行
 
-Run package tests:
+パッケージのユニットテストを実行するには、以下のコマンドを使用します：
 
 ```bash
 composer test
 ```
 
-Or directly via PHPUnit:
+または直接 PHPUnit を実行：
 
 ```bash
 ./vendor/bin/phpunit
@@ -146,13 +150,13 @@ Or directly via PHPUnit:
 
 ---
 
-## 🤝 Contributing
+## 🤝 コントリビューション
 
-Contributions, bug reports, and feature requests are welcome! Feel free to open an issue or pull request on GitHub.
+バグ報告、改善要望、プルリクエストを歓迎しています！
 
 ---
 
-## 📄 License
+## 📄 ライセンス
 
-This software is released under the [MIT License](LICENSE).  
+本ソフトウェアは [MIT License](LICENSE) の下で公開されています。  
 Copyright (c) 2026 [Brainy Software Co., Ltd.](https://brainy-software.co.jp)
