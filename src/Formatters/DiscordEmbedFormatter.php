@@ -125,7 +125,7 @@ class DiscordEmbedFormatter
         foreach ($exception->getTrace() as $index => $frame) {
             $file = $frame['file'] ?? '[internal]';
             $line = $frame['line'] ?? 0;
-            $func = ($frame['class'] ?? '') . ($frame['type'] ?? '') . ($frame['function'] ?? '');
+            $func = ($frame['class'] ?? '') . ($frame['type'] ?? '') . $frame['function'];
 
             $relFile = $file;
             if ($basePath && str_starts_with($file, $basePath)) {
@@ -147,7 +147,7 @@ class DiscordEmbedFormatter
             foreach (array_slice($exception->getTrace(), 0, $this->maxTraceLines) as $index => $frame) {
                 $file = $this->formatFilePath($frame['file'] ?? '[internal]');
                 $line = $frame['line'] ?? 0;
-                $func = ($frame['class'] ?? '') . ($frame['type'] ?? '') . ($frame['function'] ?? '');
+                $func = ($frame['class'] ?? '') . ($frame['type'] ?? '') . $frame['function'];
                 $lines[] = "#{$index} {$file}:{$line} {$func}()";
             }
         }

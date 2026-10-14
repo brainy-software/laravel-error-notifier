@@ -31,11 +31,15 @@ class ValueMasker
 
         $result = [];
         foreach ($data as $key => $value) {
-            $normalizedKey = is_string($key) ? strtolower($key) : $key;
+            if (is_string($key)) {
+                $normalizedKey = strtolower($key);
+                if ($this->shouldMaskKey($normalizedKey)) {
+                    $result[$key] = '********';
+                    continue;
+                }
+            }
 
-            if (is_string($key) && $this->shouldMaskKey($normalizedKey)) {
-                $result[$key] = '********';
-            } elseif (is_array($value)) {
+            if (is_array($value)) {
                 $result[$key] = $this->mask($value);
             } else {
                 $result[$key] = $value;

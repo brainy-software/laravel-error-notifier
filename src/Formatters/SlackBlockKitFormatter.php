@@ -155,7 +155,7 @@ class SlackBlockKitFormatter
         foreach ($exception->getTrace() as $index => $frame) {
             $file = $frame['file'] ?? '[internal]';
             $line = $frame['line'] ?? 0;
-            $func = ($frame['class'] ?? '') . ($frame['type'] ?? '') . ($frame['function'] ?? '');
+            $func = ($frame['class'] ?? '') . ($frame['type'] ?? '') . $frame['function'];
 
             // Relative file path
             $relFile = $file;
@@ -180,7 +180,7 @@ class SlackBlockKitFormatter
             foreach (array_slice($exception->getTrace(), 0, $this->maxTraceLines) as $index => $frame) {
                 $file = $this->formatFilePath($frame['file'] ?? '[internal]');
                 $line = $frame['line'] ?? 0;
-                $func = ($frame['class'] ?? '') . ($frame['type'] ?? '') . ($frame['function'] ?? '');
+                $func = ($frame['class'] ?? '') . ($frame['type'] ?? '') . $frame['function'];
                 $lines[] = "#{$index} {$file}:{$line} {$func}()";
             }
         }

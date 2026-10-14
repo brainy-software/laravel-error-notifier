@@ -151,11 +151,15 @@ class ErrorNotifierManager
 
         // Collect authenticated user if available
         try {
-            if ($request->user()) {
-                $user = $request->user();
+            $user = $request->user();
+            if (is_object($user)) {
+                $userId = method_exists($user, 'getAuthIdentifier')
+                    ? (string) $user->getAuthIdentifier()
+                    : (string) ($user->id ?? 'unknown');
+                $userEmail = isset($user->email) ? (string) $user->email : null;
                 $context['user'] = [
-                    'id' => method_exists($user, 'getAuthIdentifier') ? $user->getAuthIdentifier() : ($user->id ?? 'unknown'),
-                    'email' => $user->email ?? null,
+                    'id' => $userId,
+                    'email' => $userEmail,
                 ];
             }
         } catch (Throwable) {
