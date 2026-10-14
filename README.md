@@ -241,6 +241,21 @@ return [
 
 ---
 
+## 🗺️ 今後のロードマップ (Roadmap)
+
+今後のマイナー・メジャーアップデート（GitHub Milestones）にて、以下の機能拡張を順次予定しています：
+
+- [ ] **💬 LINE 通知対応**:
+  - LINE Messaging API / LINE WORKS と連携し、緊急性の高いエラーをスマートフォンへ直接プッシュ通知。
+- [ ] **✉️ Email 通知対応**:
+  - Laravel の標準 Mailer を活用したエラーレポートメール送信。
+- [ ] **🌐 汎用 Webhook (Custom JSON) 対応**:
+  - 社内の専用エンドポイントや PagerDuty、Opsgenie 等へ任意の JSON ペイロードを転送。
+- [ ] **👥 Microsoft Teams 対応**:
+  - Teams の Incoming Webhook (Adaptive Cards) 形式でのリッチ通知。
+
+---
+
 ## 🧪 テストの実行
 
 パッケージのユニットテストを実行するには、以下のコマンドを使用します：
