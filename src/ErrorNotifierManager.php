@@ -183,10 +183,23 @@ class ErrorNotifierManager
      */
     protected function registerDefaultChannels(): void
     {
-        $slackConfig = $this->config['channels']['slack'] ?? [];
+        $messageConfig = $this->config['message'] ?? [];
+        $maxTraceLines = $this->config['max_trace_lines'] ?? 12;
+
+        /** @var array<string, mixed> $slackRaw */
+        $slackRaw = $this->config['channels']['slack'] ?? [];
+        $slackConfig = array_merge(
+            ['message' => $messageConfig, 'max_trace_lines' => $maxTraceLines],
+            $slackRaw
+        );
         $this->channels['slack'] = new SlackChannel($slackConfig);
 
-        $discordConfig = $this->config['channels']['discord'] ?? [];
+        /** @var array<string, mixed> $discordRaw */
+        $discordRaw = $this->config['channels']['discord'] ?? [];
+        $discordConfig = array_merge(
+            ['message' => $messageConfig, 'max_trace_lines' => $maxTraceLines],
+            $discordRaw
+        );
         $this->channels['discord'] = new DiscordChannel($discordConfig);
     }
 }

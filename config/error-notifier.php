@@ -42,12 +42,41 @@ return [
             'channel' => env('ERROR_NOTIFIER_SLACK_CHANNEL', null),
             'username' => env('ERROR_NOTIFIER_SLACK_USERNAME', 'Error Notifier'),
             'icon_emoji' => env('ERROR_NOTIFIER_SLACK_ICON', ':rotating_light:'),
+            'mention' => env('ERROR_NOTIFIER_SLACK_MENTION', null), // e.g. '@channel', '<!here>', '<@U12345>'
         ],
         'discord' => [
             'enabled' => env('ERROR_NOTIFIER_DISCORD_ENABLED', true),
             'webhook_url' => env('ERROR_NOTIFIER_DISCORD_WEBHOOK', null),
             'username' => env('ERROR_NOTIFIER_DISCORD_USERNAME', 'Error Notifier'),
             'avatar_url' => env('ERROR_NOTIFIER_DISCORD_AVATAR', null),
+            'mention' => env('ERROR_NOTIFIER_DISCORD_MENTION', null), // e.g. '@everyone', '@here', '<@&role_id>'
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Message Customization & Field Visibility
+    |--------------------------------------------------------------------------
+    |
+    | Customize the notification header title and control which contextual
+    | fields (file, url, client ip, authenticated user, payload, trace)
+    | are included in the notification cards.
+    |
+    */
+    'message' => [
+        // Title template. Placeholders: {environment}, {class}, {message}
+        // When null, defaults to: '🚨 [{environment}] {class}'
+        'title' => env('ERROR_NOTIFIER_TITLE_TEMPLATE', null),
+
+        // Toggle individual fields in the notification card
+        'fields' => [
+            'file' => (bool) env('ERROR_NOTIFIER_FIELD_FILE', true),
+            'environment' => (bool) env('ERROR_NOTIFIER_FIELD_ENV', true),
+            'url' => (bool) env('ERROR_NOTIFIER_FIELD_URL', true),
+            'ip' => (bool) env('ERROR_NOTIFIER_FIELD_IP', true),
+            'user' => (bool) env('ERROR_NOTIFIER_FIELD_USER', true),
+            'payload' => (bool) env('ERROR_NOTIFIER_FIELD_PAYLOAD', true),
+            'trace' => (bool) env('ERROR_NOTIFIER_FIELD_TRACE', true),
         ],
     ],
 

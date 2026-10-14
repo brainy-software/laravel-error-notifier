@@ -97,15 +97,69 @@ ERROR_NOTIFIER_DISCORD_WEBHOOK=https://discord.com/api/webhooks/YOUR/DISCORD/WEB
 
 ---
 
-## 🛠️ 高度なカスタマイズ
+## 🖥️ リアルタイム設定ジェネレーター (GUI)
 
-通知対象の環境、スロットリング期間、除外する例外クラス、マスキングキーなどを変更したい場合は、設定ファイルを公開（パブリッシュ）してください：
+本パッケージには、ブラウザで開くだけですぐに使える **GUI 設定ジェネレーター（`generator.html`）** が同梱されています。
+
+- **リアルタイム Live プレビュー**: Slack や Discord でどのように表示されるかをその場でプレビュー確認できます。
+- **ワンクリック生成**: メンションや非表示にしたい項目にチェックを入れるだけで、`.env` および `config/error-notifier.php` のコードを自動生成し、コピーまたはダウンロードできます。
+- **完全ローカル完結**: サーバー送信なし。機密情報（Webhook URL等）が外部に漏れる心配はありません。
+
+```bash
+# generator.html をブラウザで開くだけ！
+open generator.html
+```
+
+---
+
+## 🔔 メッセージカスタマイズ & メンション
+
+Slack / Discord への通知内容をプロジェクトの要件やセキュリティポリシーに合わせて柔軟にカスタマイズできます。
+
+### 1. メンション機能
+重大エラーの発生時に、チーム全体や特定のメンバーへプッシュ通知を飛ばすことができます。
+
+```env
+# Slack: @channel, @here, 特定ユーザー (<@U12345678>)
+ERROR_NOTIFIER_SLACK_MENTION="<!channel>"
+
+# Discord: @everyone, @here, 特定ロール (<@&ロールID>)
+ERROR_NOTIFIER_DISCORD_MENTION="@here"
+```
+
+### 2. カスタムタイトル
+通知カードの最上部に表示されるタイトルテンプレートを変更できます。
+
+```env
+# プレースホルダー: {environment}, {class}, {message}
+ERROR_NOTIFIER_TITLE_TEMPLATE="🚨 [{environment}] 重大障害検知: {class}"
+```
+
+### 3. 表示フィールドの個別 ON / OFF
+社内セキュリティ規程で「クライアントIPやリクエストパラメータを社外チャットに送信したくない」場合など、項目単位で非表示にできます。
+
+```env
+# 通知に含めないフィールドを false に設定
+ERROR_NOTIFIER_FIELD_FILE=true       # 発生ファイル・行番号
+ERROR_NOTIFIER_FIELD_ENV=true        # 環境名 (production / staging)
+ERROR_NOTIFIER_FIELD_URL=true        # リクエストURL・HTTPメソッド
+ERROR_NOTIFIER_FIELD_IP=false        # クライアントIP（社内ポリシー等で非表示にする場合）
+ERROR_NOTIFIER_FIELD_USER=true       # ログインユーザーID
+ERROR_NOTIFIER_FIELD_PAYLOAD=false   # リクエスト入力データ
+ERROR_NOTIFIER_FIELD_TRACE=true      # スタックトレース
+```
+
+---
+
+## 🛠️ 高度な設定 (config/error-notifier.php)
+
+さらに詳細な設定を行いたい場合は、設定ファイルを公開（パブリッシュ）してください：
 
 ```bash
 php artisan vendor:publish --tag="error-notifier-config"
 ```
 
-実行すると `config/error-notifier.php` が生成されます：
+生成される `config/error-notifier.php` の構造：
 
 ```php
 return [
@@ -126,11 +180,28 @@ return [
             'channel' => env('ERROR_NOTIFIER_SLACK_CHANNEL', null),
             'username' => env('ERROR_NOTIFIER_SLACK_USERNAME', 'Error Notifier'),
             'icon_emoji' => env('ERROR_NOTIFIER_SLACK_ICON', ':rotating_light:'),
+            'mention' => env('ERROR_NOTIFIER_SLACK_MENTION', null),
         ],
         'discord' => [
             'enabled' => env('ERROR_NOTIFIER_DISCORD_ENABLED', true),
             'webhook_url' => env('ERROR_NOTIFIER_DISCORD_WEBHOOK', null),
             'username' => env('ERROR_NOTIFIER_DISCORD_USERNAME', 'Error Notifier'),
+            'avatar_url' => env('ERROR_NOTIFIER_DISCORD_AVATAR', null),
+            'mention' => env('ERROR_NOTIFIER_DISCORD_MENTION', null),
+        ],
+    ],
+
+    // メッセージカスタマイズ & 表示フィールド
+    'message' => [
+        'title' => env('ERROR_NOTIFIER_TITLE_TEMPLATE', null),
+        'fields' => [
+            'file' => (bool) env('ERROR_NOTIFIER_FIELD_FILE', true),
+            'environment' => (bool) env('ERROR_NOTIFIER_FIELD_ENV', true),
+            'url' => (bool) env('ERROR_NOTIFIER_FIELD_URL', true),
+            'ip' => (bool) env('ERROR_NOTIFIER_FIELD_IP', true),
+            'user' => (bool) env('ERROR_NOTIFIER_FIELD_USER', true),
+            'payload' => (bool) env('ERROR_NOTIFIER_FIELD_PAYLOAD', true),
+            'trace' => (bool) env('ERROR_NOTIFIER_FIELD_TRACE', true),
         ],
     ],
 
@@ -138,7 +209,7 @@ return [
     'throttle' => [
         'enabled' => env('ERROR_NOTIFIER_THROTTLE_ENABLED', true),
         'period' => (int) env('ERROR_NOTIFIER_THROTTLE_PERIOD', 600), // 秒単位 (600秒 = 10分)
-        'cache_store' => env('ERROR_NOTIFIER_CACHE_STORE', null), // null の場合はデフォルトのキャッシュドライバを使用
+        'cache_store' => env('ERROR_NOTIFIER_CACHE_STORE', null), // null の場合はデフォルトキャッシュ
     ],
 
     // 通知を除外する例外クラス一覧

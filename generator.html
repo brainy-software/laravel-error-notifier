@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Laravel Error Notifier - 設定ジェネレーター & プレビュー</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Slack Card Styles */
+    .slack-card {
+      background-color: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-left: 4px solid #e02424;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    /* Discord Card Styles */
+    .discord-card {
+      background-color: #2b2d31;
+      border-left: 4px solid #e02424;
+      font-family: "gg sans", "Noto Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen">
+  <!-- Header -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <span class="text-2xl">🚨</span>
+        <div>
+          <h1 class="text-lg font-bold text-slate-900 leading-none">Laravel Error Notifier</h1>
+          <p class="text-xs text-slate-500 mt-0.5">Configuration Generator & Real-time Live Preview</p>
+        </div>
+      </div>
+      <div class="flex items-center space-x-2">
+        <span class="text-xs bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded-full font-medium border border-indigo-100">OSS Package</span>
+        <a href="https://b-beacon.biz" target="_blank" rel="noopener" class="text-xs text-slate-500 hover:text-indigo-600 transition flex items-center space-x-1">
+          <span>Powered by B-Beacon</span>
+          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      
+      <!-- Left Column: Form Settings (7 cols) -->
+      <div class="lg:col-span-7 space-y-6">
+        
+        <!-- Channels Section -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+          <h2 class="text-base font-bold text-slate-900 flex items-center space-x-2 mb-4">
+            <span class="w-2 h-2 rounded-full bg-indigo-600"></span>
+            <span>1. 通知チャンネル設定 (Channels)</span>
+          </h2>
+
+          <!-- Slack Tab / Discord Tab -->
+          <div class="space-y-5">
+            <!-- Slack -->
+            <div class="border border-slate-200 rounded-lg p-4 bg-slate-50/50">
+              <div class="flex items-center justify-between mb-3">
+                <label class="flex items-center space-x-2 font-semibold text-slate-800 text-sm cursor-pointer">
+                  <input type="checkbox" id="slack_enabled" checked class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500">
+                  <span>Slack Webhook 通知</span>
+                </label>
+                <span class="text-xs bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-mono">Block Kit</span>
+              </div>
+              <div class="space-y-3 pl-6">
+                <div>
+                  <label class="block text-xs font-medium text-slate-600 mb-1">Webhook URL</label>
+                  <input type="url" id="slack_webhook" placeholder="https://hooks.slack.com/services/..." class="w-full text-xs font-mono p-2 border border-slate-300 rounded focus:ring-1 focus:ring-indigo-500">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="block text-xs font-medium text-slate-600 mb-1">メンション (任意)</label>
+                    <input type="text" id="slack_mention" placeholder="<!channel> や <!here>" class="w-full text-xs p-2 border border-slate-300 rounded focus:ring-1 focus:ring-indigo-500">
+                  </div>
+                  <div>
+                    <label class="block text-xs font-medium text-slate-600 mb-1">BOT ユーザー名</label>
+                    <input type="text" id="slack_username" value="Error Notifier" class="w-full text-xs p-2 border border-slate-300 rounded focus:ring-1 focus:ring-indigo-500">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Discord -->
+            <div class="border border-slate-200 rounded-lg p-4 bg-slate-50/50">
+              <div class="flex items-center justify-between mb-3">
+                <label class="flex items-center space-x-2 font-semibold text-slate-800 text-sm cursor-pointer">
+                  <input type="checkbox" id="discord_enabled" checked class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500">
+                  <span>Discord Webhook 通知</span>
+                </label>
+                <span class="text-xs bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded font-mono">Rich Embed</span>
+              </div>
+              <div class="space-y-3 pl-6">
+                <div>
+                  <label class="block text-xs font-medium text-slate-600 mb-1">Webhook URL</label>
+                  <input type="url" id="discord_webhook" placeholder="https://discord.com/api/webhooks/..." class="w-full text-xs font-mono p-2 border border-slate-300 rounded focus:ring-1 focus:ring-indigo-500">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="block text-xs font-medium text-slate-600 mb-1">メンション (任意)</label>
+                    <input type="text" id="discord_mention" placeholder="@everyone や @here" class="w-full text-xs p-2 border border-slate-300 rounded focus:ring-1 focus:ring-indigo-500">
+                  </div>
+                  <div>
+                    <label class="block text-xs font-medium text-slate-600 mb-1">BOT ユーザー名</label>
+                    <input type="text" id="discord_username" value="Error Notifier" class="w-full text-xs p-2 border border-slate-300 rounded focus:ring-1 focus:ring-indigo-500">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Custom Message & Fields -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+          <h2 class="text-base font-bold text-slate-900 flex items-center space-x-2 mb-4">
+            <span class="w-2 h-2 rounded-full bg-indigo-600"></span>
+            <span>2. メッセージ & 表示項目カスタマイズ (Message Fields)</span>
+          </h2>
+
+          <div class="space-y-4">
+            <div>
+              <label class="block text-xs font-medium text-slate-700 mb-1">
+                カスタムタイトル (プレースホルダー: <code class="bg-slate-100 px-1 py-0.5 rounded text-indigo-600">{environment}</code>, <code class="bg-slate-100 px-1 py-0.5 rounded text-indigo-600">{class}</code>)
+              </label>
+              <input type="text" id="custom_title" value="🚨 [{environment}] {class}" class="w-full text-xs font-mono p-2 border border-slate-300 rounded focus:ring-1 focus:ring-indigo-500">
+            </div>
+
+            <div>
+              <label class="block text-xs font-medium text-slate-700 mb-2">通知カードに表示する項目 (個別ON/OFF)</label>
+              <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                <label class="flex items-center space-x-2 text-xs text-slate-700 cursor-pointer">
+                  <input type="checkbox" id="field_file" checked class="w-4 h-4 text-indigo-600 rounded border-slate-300">
+                  <span>発生ファイル・行番号</span>
+                </label>
+                <label class="flex items-center space-x-2 text-xs text-slate-700 cursor-pointer">
+                  <input type="checkbox" id="field_env" checked class="w-4 h-4 text-indigo-600 rounded border-slate-300">
+                  <span>環境 (Environment)</span>
+                </label>
+                <label class="flex items-center space-x-2 text-xs text-slate-700 cursor-pointer">
+                  <input type="checkbox" id="field_url" checked class="w-4 h-4 text-indigo-600 rounded border-slate-300">
+                  <span>URL / メソッド</span>
+                </label>
+                <label class="flex items-center space-x-2 text-xs text-slate-700 cursor-pointer">
+                  <input type="checkbox" id="field_ip" checked class="w-4 h-4 text-indigo-600 rounded border-slate-300">
+                  <span>クライアント IP</span>
+                </label>
+                <label class="flex items-center space-x-2 text-xs text-slate-700 cursor-pointer">
+                  <input type="checkbox" id="field_user" checked class="w-4 h-4 text-indigo-600 rounded border-slate-300">
+                  <span>ログインユーザー ID</span>
+                </label>
+                <label class="flex items-center space-x-2 text-xs text-slate-700 cursor-pointer">
+                  <input type="checkbox" id="field_payload" checked class="w-4 h-4 text-indigo-600 rounded border-slate-300">
+                  <span>リクエストデータ (JSON)</span>
+                </label>
+                <label class="flex items-center space-x-2 text-xs text-slate-700 cursor-pointer">
+                  <input type="checkbox" id="field_trace" checked class="w-4 h-4 text-indigo-600 rounded border-slate-300">
+                  <span>スタックトレース</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-slate-100">
+              <div>
+                <label class="block text-xs font-medium text-slate-700 mb-1">スタックトレース表示行数</label>
+                <input type="number" id="max_trace_lines" value="10" min="1" max="30" class="w-full text-xs p-2 border border-slate-300 rounded focus:ring-1 focus:ring-indigo-500">
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-slate-700 mb-1">スロットリング抑制期間 (同一エラー連打防止)</label>
+                <div class="flex items-center space-x-2">
+                  <input type="number" id="throttle_period" value="600" min="10" step="10" class="w-full text-xs p-2 border border-slate-300 rounded focus:ring-1 focus:ring-indigo-500">
+                  <span class="text-xs text-slate-500 whitespace-nowrap">秒 (10分)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Security & Masking -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+          <h2 class="text-base font-bold text-slate-900 flex items-center space-x-2 mb-4">
+            <span class="w-2 h-2 rounded-full bg-indigo-600"></span>
+            <span>3. セキュリティ & 機密情報マスキング (Mask Keys)</span>
+          </h2>
+          <div>
+            <label class="block text-xs font-medium text-slate-700 mb-1">自動マスク対象パラメータ（カンマ区切り）</label>
+            <textarea id="mask_keys" rows="2" class="w-full text-xs font-mono p-2 border border-slate-300 rounded focus:ring-1 focus:ring-indigo-500">password, password_confirmation, token, secret, api_key, access_token, credit_card, cvv</textarea>
+            <p class="text-[11px] text-slate-400 mt-1">※ リクエストに含まれる上記キーの値は自動的に `********` に置換されます。</p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right Column: Live Preview (5 cols) -->
+      <div class="lg:col-span-5 space-y-6">
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 sticky top-24">
+          <div class="flex items-center justify-between border-b border-slate-200 pb-3 mb-4">
+            <h2 class="text-base font-bold text-slate-900 flex items-center space-x-2">
+              <span>👁️ リアルタイムプレビュー</span>
+            </h2>
+            <div class="flex space-x-1 bg-slate-100 p-0.5 rounded-lg text-xs">
+              <button id="tab_slack" onclick="switchTab('slack')" class="px-3 py-1 font-semibold rounded-md bg-white text-slate-800 shadow-sm transition">Slack</button>
+              <button id="tab_discord" onclick="switchTab('discord')" class="px-3 py-1 font-semibold rounded-md text-slate-500 hover:text-slate-800 transition">Discord</button>
+            </div>
+          </div>
+
+          <!-- Slack Preview Pane -->
+          <div id="preview_slack_pane" class="space-y-3">
+            <div id="slack_mention_preview" class="text-xs text-sky-700 font-medium hidden">@channel</div>
+            
+            <div class="slack-card rounded p-4 text-xs space-y-3">
+              <!-- Header -->
+              <div id="slack_preview_title" class="text-sm font-bold text-slate-900 flex items-center space-x-1">
+                <span>🚨 [PRODUCTION] RuntimeException</span>
+              </div>
+              <!-- Message -->
+              <div class="bg-slate-100 p-2.5 rounded font-mono text-slate-700 text-[11px] break-all border border-slate-200">
+                SQLSTATE[HY000] [2002] Connection refused: Database server is unreachable.
+              </div>
+              <!-- Fields Grid -->
+              <div id="slack_preview_fields" class="grid grid-cols-2 gap-2 text-[11px] pt-1 border-t border-slate-100">
+                <!-- Injected via JS -->
+              </div>
+              <!-- Payload -->
+              <div id="slack_preview_payload" class="pt-1">
+                <span class="text-[11px] font-bold text-slate-700">Request Data (Sanitized):</span>
+                <pre class="bg-slate-900 text-emerald-400 p-2 rounded text-[10px] font-mono mt-1 overflow-x-auto">{\n  "email": "user@example.com",\n  "password": "********"\n}</pre>
+              </div>
+              <!-- Trace -->
+              <div id="slack_preview_trace" class="pt-1">
+                <span class="text-[11px] font-bold text-slate-700">Stack Trace (Application Code):</span>
+                <pre id="slack_trace_code" class="bg-slate-100 text-slate-700 p-2 rounded text-[10px] font-mono mt-1 overflow-x-auto border border-slate-200">#0 app/Http/Controllers/OrderController.php:42 OrderController->checkout()
+#1 routes/web.php:18 Route::post()</pre>
+              </div>
+              <!-- Footer -->
+              <div class="text-[10px] text-slate-400 pt-2 border-t border-slate-100 flex items-center justify-between">
+                <span>🕒 2026-10-14 17:00:00 JST</span>
+                <span class="text-slate-500">Powered by B-Beacon</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Discord Preview Pane -->
+          <div id="preview_discord_pane" class="space-y-3 hidden">
+            <div id="discord_mention_preview" class="text-xs text-indigo-400 font-medium hidden">@everyone</div>
+            
+            <div class="discord-card rounded p-4 text-xs text-slate-200 space-y-3">
+              <!-- Title -->
+              <div id="discord_preview_title" class="text-sm font-bold text-white">
+                🚨 [PRODUCTION] RuntimeException
+              </div>
+              <!-- Message -->
+              <div class="bg-[#1e1f22] p-2.5 rounded font-mono text-slate-300 text-[11px] break-all border border-[#1e1f22]">
+                SQLSTATE[HY000] [2002] Connection refused: Database server is unreachable.
+              </div>
+              <!-- Fields Grid -->
+              <div id="discord_preview_fields" class="grid grid-cols-2 gap-2 text-[11px] pt-1 border-t border-[#3b3e45]">
+                <!-- Injected via JS -->
+              </div>
+              <!-- Payload -->
+              <div id="discord_preview_payload" class="pt-1">
+                <span class="text-[11px] font-semibold text-slate-300">📦 Request Data (Sanitized)</span>
+                <pre class="bg-[#1e1f22] text-emerald-400 p-2 rounded text-[10px] font-mono mt-1 overflow-x-auto">{\n  "email": "user@example.com",\n  "password": "********"\n}</pre>
+              </div>
+              <!-- Trace -->
+              <div id="discord_preview_trace" class="pt-1">
+                <span class="text-[11px] font-semibold text-slate-300">📜 Stack Trace (Application Code)</span>
+                <pre id="discord_trace_code" class="bg-[#1e1f22] text-slate-300 p-2 rounded text-[10px] font-mono mt-1 overflow-x-auto border border-[#3b3e45]">#0 app/Http/Controllers/OrderController.php:42 OrderController->checkout()
+#1 routes/web.php:18 Route::post()</pre>
+              </div>
+              <!-- Footer -->
+              <div class="text-[10px] text-slate-400 pt-2 border-t border-[#3b3e45] flex items-center justify-between">
+                <span>2026-10-14 17:00:00 JST</span>
+                <span>Powered by B-Beacon</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-4 p-3 bg-amber-50 rounded-lg border border-amber-200 text-[11px] text-amber-800 flex items-start space-x-2">
+            <span class="text-sm leading-none">💡</span>
+            <span>設定変更は上のプレビューにリアルタイム反映されます。下部のボタンで `.env` と設定ファイルを一発生成！</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Generated Code Outputs Section -->
+    <div class="mt-12 space-y-6">
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h2 class="text-base font-bold text-slate-900">4. 生成された設定コード (Generated Config & .env)</h2>
+            <p class="text-xs text-slate-500">プロジェクトにそのまま貼り付けるだけで利用開始できます。</p>
+          </div>
+          <div class="flex space-x-2">
+            <button onclick="downloadConfigFile()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition flex items-center space-x-1">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+              <span>PHP設定ファイルを保存</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- .env code -->
+          <div>
+            <div class="flex items-center justify-between pb-2">
+              <span class="text-xs font-bold text-slate-700 font-mono">.env に追記する内容</span>
+              <button onclick="copyToClipboard('env_output', this)" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium">📋 コピー</button>
+            </div>
+            <pre id="env_output" class="bg-slate-900 text-slate-200 p-4 rounded-lg font-mono text-xs overflow-x-auto h-72 border border-slate-800"></pre>
+          </div>
+
+          <!-- config/error-notifier.php code snippet -->
+          <div>
+            <div class="flex items-center justify-between pb-2">
+              <span class="text-xs font-bold text-slate-700 font-mono">config/error-notifier.php</span>
+              <button onclick="copyToClipboard('config_output', this)" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium">📋 コピー</button>
+            </div>
+            <pre id="config_output" class="bg-slate-900 text-slate-200 p-4 rounded-lg font-mono text-xs overflow-x-auto h-72 border border-slate-800"></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="mt-16 bg-white border-t border-slate-200 py-6">
+    <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500">
+      <p>Developed with ❤️ by <a href="https://brainy.co.jp" class="underline hover:text-slate-800">Brainy Software LLC (合同会社ブレイニーソフトウェア)</a> & <a href="https://b-beacon.biz" class="underline hover:text-slate-800">B-Beacon</a></p>
+      <p class="mt-1">Released under the MIT License. Fully Open Source.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Tab switching
+    function switchTab(tab) {
+      const slackTab = document.getElementById('tab_slack');
+      const discordTab = document.getElementById('tab_discord');
+      const slackPane = document.getElementById('preview_slack_pane');
+      const discordPane = document.getElementById('preview_discord_pane');
+
+      if (tab === 'slack') {
+        slackTab.className = "px-3 py-1 font-semibold rounded-md bg-white text-slate-800 shadow-sm transition";
+        discordTab.className = "px-3 py-1 font-semibold rounded-md text-slate-500 hover:text-slate-800 transition";
+        slackPane.classList.remove('hidden');
+        discordPane.classList.add('hidden');
+      } else {
+        discordTab.className = "px-3 py-1 font-semibold rounded-md bg-[#5865F2] text-white shadow-sm transition";
+        slackTab.className = "px-3 py-1 font-semibold rounded-md text-slate-500 hover:text-slate-800 transition";
+        discordPane.classList.remove('hidden');
+        slackPane.classList.add('hidden');
+      }
+    }
+
+    // Live update function
+    function updateOutputs() {
+      const slackEnabled = document.getElementById('slack_enabled').checked;
+      const slackWebhook = document.getElementById('slack_webhook').value.trim();
+      const slackMention = document.getElementById('slack_mention').value.trim();
+      const slackUser = document.getElementById('slack_username').value.trim() || 'Error Notifier';
+
+      const discordEnabled = document.getElementById('discord_enabled').checked;
+      const discordWebhook = document.getElementById('discord_webhook').value.trim();
+      const discordMention = document.getElementById('discord_mention').value.trim();
+      const discordUser = document.getElementById('discord_username').value.trim() || 'Error Notifier';
+
+      const customTitle = document.getElementById('custom_title').value.trim() || '🚨 [{environment}] {class}';
+      const fieldFile = document.getElementById('field_file').checked;
+      const fieldEnv = document.getElementById('field_env').checked;
+      const fieldUrl = document.getElementById('field_url').checked;
+      const fieldIp = document.getElementById('field_ip').checked;
+      const fieldUser = document.getElementById('field_user').checked;
+      const fieldPayload = document.getElementById('field_payload').checked;
+      const fieldTrace = document.getElementById('field_trace').checked;
+      const maxTrace = parseInt(document.getElementById('max_trace_lines').value) || 10;
+      const throttleSec = parseInt(document.getElementById('throttle_period').value) || 600;
+      const maskKeys = document.getElementById('mask_keys').value.trim();
+
+      // --- 1. Update Previews ---
+      // Titles
+      const resolvedTitle = customTitle.replace('{environment}', 'PRODUCTION').replace('{class}', 'RuntimeException');
+      document.getElementById('slack_preview_title').textContent = resolvedTitle;
+      document.getElementById('discord_preview_title').textContent = resolvedTitle;
+
+      // Mentions
+      const slackMentionEl = document.getElementById('slack_mention_preview');
+      if (slackMention) {
+        slackMentionEl.textContent = slackMention;
+        slackMentionEl.classList.remove('hidden');
+      } else {
+        slackMentionEl.classList.add('hidden');
+      }
+
+      const discordMentionEl = document.getElementById('discord_mention_preview');
+      if (discordMention) {
+        discordMentionEl.textContent = discordMention;
+        discordMentionEl.classList.remove('hidden');
+      } else {
+        discordMentionEl.classList.add('hidden');
+      }
+
+      // Fields Grid
+      let slackFieldsHtml = '';
+      let discordFieldsHtml = '';
+
+      if (fieldFile) {
+        slackFieldsHtml += `<div><span class="font-bold text-slate-700">File:</span><br><code class="text-[10px] text-slate-600">app/Http/Controllers/OrderController.php:42</code></div>`;
+        discordFieldsHtml += `<div><span class="font-semibold text-slate-300">📁 File</span><br><code class="text-[10px] text-slate-400">app/Http/Controllers/OrderController.php:42</code></div>`;
+      }
+      if (fieldEnv) {
+        slackFieldsHtml += `<div><span class="font-bold text-slate-700">Environment:</span><br><code class="text-[10px] text-slate-600">PRODUCTION</code></div>`;
+        discordFieldsHtml += `<div><span class="font-semibold text-slate-300">🌍 Environment</span><br><code class="text-[10px] text-slate-400">PRODUCTION</code></div>`;
+      }
+      if (fieldUrl) {
+        slackFieldsHtml += `<div><span class="font-bold text-slate-700">Request:</span><br><code class="text-[10px] text-slate-600">POST https://example.com/api/checkout</code></div>`;
+        discordFieldsHtml += `<div><span class="font-semibold text-slate-300">🔗 Request</span><br><code class="text-[10px] text-slate-400">POST /api/checkout</code></div>`;
+      }
+      if (fieldIp) {
+        slackFieldsHtml += `<div><span class="font-bold text-slate-700">Client IP:</span><br><code class="text-[10px] text-slate-600">203.0.113.195</code></div>`;
+        discordFieldsHtml += `<div><span class="font-semibold text-slate-300">🖥️ Client IP</span><br><code class="text-[10px] text-slate-400">203.0.113.195</code></div>`;
+      }
+      if (fieldUser) {
+        slackFieldsHtml += `<div><span class="font-bold text-slate-700">User:</span><br><code class="text-[10px] text-slate-600">ID: 42 (alice@example.com)</code></div>`;
+        discordFieldsHtml += `<div><span class="font-semibold text-slate-300">👤 User</span><br><code class="text-[10px] text-slate-400">ID: 42</code></div>`;
+      }
+
+      document.getElementById('slack_preview_fields').innerHTML = slackFieldsHtml;
+      document.getElementById('discord_preview_fields').innerHTML = discordFieldsHtml;
+
+      // Payload Visibility
+      document.getElementById('slack_preview_payload').style.display = fieldPayload ? 'block' : 'none';
+      document.getElementById('discord_preview_payload').style.display = fieldPayload ? 'block' : 'none';
+
+      // Trace Visibility & Lines
+      document.getElementById('slack_preview_trace').style.display = fieldTrace ? 'block' : 'none';
+      document.getElementById('discord_preview_trace').style.display = fieldTrace ? 'block' : 'none';
+
+      let traceLines = [];
+      for (let i = 0; i < maxTrace; i++) {
+        traceLines.push(`#${i} app/Services/PaymentService.php:${30 + i * 5} PaymentService->process()`);
+      }
+      const traceText = traceLines.slice(0, Math.min(maxTrace, 4)).join('\n') + (maxTrace > 4 ? `\n... (+${maxTrace - 4} frames)` : '');
+      document.getElementById('slack_trace_code').textContent = traceText;
+      document.getElementById('discord_trace_code').textContent = traceText;
+
+      // --- 2. Generate .env ---
+      let envLines = [
+        '# =========================================',
+        '# Laravel Error Notifier (brainy/laravel-error-notifier)',
+        '# =========================================',
+        'ERROR_NOTIFIER_ENABLED=true',
+        '',
+        '# Slack Channel',
+        `ERROR_NOTIFIER_SLACK_ENABLED=${slackEnabled}`,
+        `ERROR_NOTIFIER_SLACK_WEBHOOK=${slackWebhook || 'https://hooks.slack.com/services/...'}`
+      ];
+      if (slackMention) envLines.push(`ERROR_NOTIFIER_SLACK_MENTION="${slackMention}"`);
+      if (slackUser !== 'Error Notifier') envLines.push(`ERROR_NOTIFIER_SLACK_USERNAME="${slackUser}"`);
+
+      envLines.push('');
+      envLines.push('# Discord Channel');
+      envLines.push(`ERROR_NOTIFIER_DISCORD_ENABLED=${discordEnabled}`);
+      envLines.push(`ERROR_NOTIFIER_DISCORD_WEBHOOK=${discordWebhook || 'https://discord.com/api/webhooks/...'}`);
+      if (discordMention) envLines.push(`ERROR_NOTIFIER_DISCORD_MENTION="${discordMention}"`);
+      if (discordUser !== 'Error Notifier') envLines.push(`ERROR_NOTIFIER_DISCORD_USERNAME="${discordUser}"`);
+
+      envLines.push('');
+      envLines.push('# Rate Limiting / Throttle (Seconds)');
+      envLines.push(`ERROR_NOTIFIER_THROTTLE_PERIOD=${throttleSec}`);
+
+      envLines.push('');
+      envLines.push('# Message Customization');
+      if (customTitle !== '🚨 [{environment}] {class}') {
+        envLines.push(`ERROR_NOTIFIER_TITLE_TEMPLATE="${customTitle}"`);
+      }
+      if (!fieldFile) envLines.push('ERROR_NOTIFIER_FIELD_FILE=false');
+      if (!fieldEnv) envLines.push('ERROR_NOTIFIER_FIELD_ENV=false');
+      if (!fieldUrl) envLines.push('ERROR_NOTIFIER_FIELD_URL=false');
+      if (!fieldIp) envLines.push('ERROR_NOTIFIER_FIELD_IP=false');
+      if (!fieldUser) envLines.push('ERROR_NOTIFIER_FIELD_USER=false');
+      if (!fieldPayload) envLines.push('ERROR_NOTIFIER_FIELD_PAYLOAD=false');
+      if (!fieldTrace) envLines.push('ERROR_NOTIFIER_FIELD_TRACE=false');
+
+      document.getElementById('env_output').textContent = envLines.join('\n');
+
+      // --- 3. Generate config snippet ---
+      const maskKeysArray = maskKeys.split(',').map(k => `'${k.trim()}'`).filter(k => k !== "''").join(',\n        ');
+      const phpConfig = `<?php
+
+return [
+    'enabled' => env('ERROR_NOTIFIER_ENABLED', null),
+
+    'environments' => [
+        'production',
+        'staging',
+    ],
+
+    'channels' => [
+        'slack' => [
+            'enabled' => env('ERROR_NOTIFIER_SLACK_ENABLED', ${slackEnabled}),
+            'webhook_url' => env('ERROR_NOTIFIER_SLACK_WEBHOOK', ${slackWebhook ? `'${slackWebhook}'` : 'null'}),
+            'channel' => env('ERROR_NOTIFIER_SLACK_CHANNEL', null),
+            'username' => env('ERROR_NOTIFIER_SLACK_USERNAME', '${slackUser}'),
+            'icon_emoji' => env('ERROR_NOTIFIER_SLACK_ICON', ':rotating_light:'),
+            'mention' => env('ERROR_NOTIFIER_SLACK_MENTION', ${slackMention ? `'${slackMention}'` : 'null'}),
+        ],
+        'discord' => [
+            'enabled' => env('ERROR_NOTIFIER_DISCORD_ENABLED', ${discordEnabled}),
+            'webhook_url' => env('ERROR_NOTIFIER_DISCORD_WEBHOOK', ${discordWebhook ? `'${discordWebhook}'` : 'null'}),
+            'username' => env('ERROR_NOTIFIER_DISCORD_USERNAME', '${discordUser}'),
+            'avatar_url' => env('ERROR_NOTIFIER_DISCORD_AVATAR', null),
+            'mention' => env('ERROR_NOTIFIER_DISCORD_MENTION', ${discordMention ? `'${discordMention}'` : 'null'}),
+        ],
+    ],
+
+    'message' => [
+        'title' => env('ERROR_NOTIFIER_TITLE_TEMPLATE', ${customTitle !== '🚨 [{environment}] {class}' ? `'${customTitle}'` : 'null'}),
+        'fields' => [
+            'file' => (bool) env('ERROR_NOTIFIER_FIELD_FILE', ${fieldFile}),
+            'environment' => (bool) env('ERROR_NOTIFIER_FIELD_ENV', ${fieldEnv}),
+            'url' => (bool) env('ERROR_NOTIFIER_FIELD_URL', ${fieldUrl}),
+            'ip' => (bool) env('ERROR_NOTIFIER_FIELD_IP', ${fieldIp}),
+            'user' => (bool) env('ERROR_NOTIFIER_FIELD_USER', ${fieldUser}),
+            'payload' => (bool) env('ERROR_NOTIFIER_FIELD_PAYLOAD', ${fieldPayload}),
+            'trace' => (bool) env('ERROR_NOTIFIER_FIELD_TRACE', ${fieldTrace}),
+        ],
+    ],
+
+    'throttle' => [
+        'enabled' => env('ERROR_NOTIFIER_THROTTLE_ENABLED', true),
+        'period' => (int) env('ERROR_NOTIFIER_THROTTLE_PERIOD', ${throttleSec}),
+        'cache_store' => env('ERROR_NOTIFIER_CACHE_STORE', null),
+    ],
+
+    'mask_keys' => [
+        ${maskKeysArray}
+    ],
+
+    'max_trace_lines' => ${maxTrace},
+];
+`;
+      document.getElementById('config_output').textContent = phpConfig;
+    }
+
+    // Copy to clipboard
+    function copyToClipboard(id, btn) {
+      const text = document.getElementById(id).textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        const orig = btn.textContent;
+        btn.textContent = '✅ コピー完了！';
+        setTimeout(() => btn.textContent = orig, 2000);
+      });
+    }
+
+    // Download config file
+    function downloadConfigFile() {
+      const code = document.getElementById('config_output').textContent;
+      const blob = new Blob([code], { type: 'text/plain;charset=utf-8' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'error-notifier.php';
+      a.click();
+    }
+
+    // Attach event listeners
+    const inputs = document.querySelectorAll('input, textarea, select');
+    inputs.forEach(input => input.addEventListener('input', updateOutputs));
+    inputs.forEach(input => input.addEventListener('change', updateOutputs));
+
+    // Initial run
+    updateOutputs();
+  </script>
+</body>
+</html>
