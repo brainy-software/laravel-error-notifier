@@ -159,4 +159,4 @@ composer test
 ## 📄 ライセンス
 
 本ソフトウェアは [MIT License](LICENSE) の下で公開されています。  
-Copyright (c) 2026 [Brainy Software Co., Ltd.](https://brainy-software.co.jp)
+Copyright (c) 2026 [合同会社ブレイニーソフトウェア (Brainy Software LLC)](https://brainy-software.co.jp)
