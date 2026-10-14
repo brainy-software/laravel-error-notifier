@@ -7,22 +7,29 @@
 サーバー構築や外部 SaaS（Sentry や Datadog など）の契約が一切不要な、Laravel 専用の軽量リアルタイムエラー通知パッケージです。  
 未処理の例外や 500 系エラーを、見やすい **Slack**（Block Kit 形式）や **Discord**（Embed 形式）へ即座にリッチ通知します。
 
-
+<p align="center">
+  <img src="art/slack-preview.png" width="48%" alt="Slack Block Kit Notification" />
+  <img src="art/discord-preview.png" width="48%" alt="Discord Rich Embed Notification" />
+</p>
 
 ## ✨ 主な特徴
 
 - **⚡ ゼロコンフィグ即時導入**:
   - `composer require` して `.env` に Webhook URL を設定するだけ。Laravel Package Discovery により追加コード不要ですぐに動きます。
+- **🖥️ リアルタイム GUI 設定ジェネレーター同梱**:
+  - 単一 HTML ファイルの `generator.html` を同梱。ブラウザでプレビューを見ながら、直感的なクリック操作で `.env` や `config` コードを一発生成できます。
 - **🎨 リッチで見やすい通知デザイン**:
   - **Slack (Block Kit)**: 例外クラス名、エラーメッセージ、発生URL/HTTPメソッド、クライアントIP、ログインユーザー、アプリコードに絞ったスタックトレースを綺麗にカード表示。
   - **Discord (Embeds)**: カラーリングされた見やすいフィールド構成で通知。
+- **🔔 メンション & メッセージカスタマイズ**:
+  - Slack (`@channel`, `@here`) や Discord (`@everyone`, `@here`) のプッシュ通知メンション、タイトルテンプレート変更、各項目の個別表示ON/OFFに完全対応。
 - **🛡️ 通知の連打防止（スロットリング機能）**:
   - Laravel のキャッシュ機能（Cache）を活用し、同じエラーが短時間に大量発生しても通知がパンクしない仕組み（デフォルト: 同一エラーは10分間に1回のみ通知）。
 - **🔒 機密データの自動マスキング**:
   - リクエストパラメータ内のパスワード、APIトークン、シークレット鍵、クレジットカード番号などを自動的に `********` に置換して送信。
 - **🎯 不要な例外の除外フィルター**:
   - 404（NotFound）、422（バリデーションエラー）、403（アクセス拒否）、419（CSRFトークン不一致）など、対応不要なクライアント起因のエラーはデフォルトで自動除外。
-- **🧩 Laravel 11 & 12 完全対応**:
+- **🧩 Laravel 11, 12, 13 完全対応**:
   - 最新の Laravel 例外ハンドリング機構（`bootstrap/app.php`）に自動適応。
 
 ---
